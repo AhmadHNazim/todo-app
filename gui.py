@@ -24,45 +24,49 @@ window = sg.Window("My To-Do App",
 
 while True:
     event, values = window.read(timeout=200)
-    window["clock"].update(time.strftime('%b %d, %Y %H:%M:%S'))
+    if event in (None, 'exit', sg.WIN_CLOSED):
+        break
 
-    match event:
-        case "Add":
-            if values["todo"] == "":
-                sg.popup("Please enter a todo first", font=("Helvetica", 20))
-            else:
-                todos = functions.get_todos()
-                todos.append(values["todo"] + "\n")
-                functions.write_todos(todos)
-                window["todos"].update(values=todos)
-        case "Edit":
-            try:
-                todo_to_edit = values["todos"][0]
-                new_todo = values["todo"] + "\n"
+    else:
+        window["clock"].update(value=time.strftime('%b %d, %Y %H:%M:%S'))
 
-                todos = functions.get_todos()
-                index = todos.index(todo_to_edit)
-                todos[index] = new_todo
-                functions.write_todos(todos)
-                window["todos"].update(values=todos)
-            except IndexError:
-                sg.popup("Please select an item first", font=("Helvetica", 20))
-        case "Complete":
-            try:
-                todo_to_remove = values["todos"][0]
+        match event:
+            case "Add":
+                if values["todo"] == "":
+                    sg.popup("Please enter a todo first", font=("Helvetica", 20))
+                else:
+                    todos = functions.get_todos()
+                    todos.append(values["todo"] + "\n")
+                    functions.write_todos(todos)
+                    window["todos"].update(values=todos)
+            case "Edit":
+                try:
+                    todo_to_edit = values["todos"][0]
+                    new_todo = values["todo"] + "\n"
 
-                todos = functions.get_todos()
-                todos.remove(todo_to_remove)
-                functions.write_todos(todos)
-                window["todos"].update(values=todos)
-                window["todo"].update(value="")
-            except IndexError:
-                sg.popup("Please select an item first", font=("Helvetica", 20))
-        case "Exit":
-            break
-        case "todos":
-            window["todo"].update(value=values["todos"][0])
-        case sg.WIN_CLOSED:
-            break
+                    todos = functions.get_todos()
+                    index = todos.index(todo_to_edit)
+                    todos[index] = new_todo
+                    functions.write_todos(todos)
+                    window["todos"].update(values=todos)
+                except IndexError:
+                    sg.popup("Please select an item first", font=("Helvetica", 20))
+            case "Complete":
+                try:
+                    todo_to_remove = values["todos"][0]
+
+                    todos = functions.get_todos()
+                    todos.remove(todo_to_remove)
+                    functions.write_todos(todos)
+                    window["todos"].update(values=todos)
+                    window["todo"].update(value="")
+                except IndexError:
+                    sg.popup("Please select an item first", font=("Helvetica", 20))
+            case "Exit":
+                break
+            case "todos":
+                window["todo"].update(value=values["todos"][0])
+            case sg.WIN_CLOSED:
+                break
 
 window.close()
